@@ -183,12 +183,13 @@ along with the cluster, use `./prereqs-uninstall.sh`.
 
 ```bash
 export SH_CONTROL_PLANE_URL=http://127.0.0.1:18090
+# Default model is `claude-opus-4-8`. Override by setting SH_MODEL to another model ID.
+export SH_MODEL=claude-opus-4-8
 mocactl login
-# ANTHROPIC_BASE_URL points at an Anthropic-compatible endpoint (e.g. a
-# LiteLLM gateway); ANTHROPIC_AUTH_TOKEN is the bearer token for it.
 printf %s "$ANTHROPIC_AUTH_TOKEN" | mocactl credentials add anthropic \
   --host "$(printf %s "$ANTHROPIC_BASE_URL" | awk -F/ '{print $3}')" --kind bearer \
   --endpoint "$ANTHROPIC_BASE_URL"
+
 mocactl doctor
 ```
 
