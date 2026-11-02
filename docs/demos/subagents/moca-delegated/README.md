@@ -129,7 +129,15 @@ cd "$CLONE_DIR/state-lab/docs/demos/subagents/moca-delegated"
 
 ### Install the cluster-side pieces
 
+> **Important:** The harness expects an Anthropic‑compatible endpoint and token. Make sure `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` (and, if desired, `SH_MODEL`) are exported in your shell *before* you run `./prereqs-install.sh`. Otherwise the install script will error out silently.
+
+
 ```bash
+export ANTHROPIC_BASE_URL=<your-anthropic-base-url>
+export ANTHROPIC_AUTH_TOKEN=<your-anthropic-auth-token>
+# optional – change model if desired
+export SH_MODEL=claude-opus-4-8
+
 SH_GITHUB_CLIENT_ID=<your-oauth-client-id> \
 CLONE_DIR=<parent-of-both-checkouts> \
   ./prereqs-install.sh
