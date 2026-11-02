@@ -143,10 +143,14 @@ cd "$CLONE_DIR/state-lab/docs/demos/subagents/moca-delegated"
 export ANTHROPIC_BASE_URL=<your-anthropic-base-url>
 export ANTHROPIC_AUTH_TOKEN=<your-anthropic-auth-token>
 
-SH_GITHUB_CLIENT_ID=<your-oauth-client-id> \
+SH_TEST_USERS=1 \
+SH_TEST_USER_SECRET=<some-16+-char-string> \
 CLONE_DIR=<parent-of-both-checkouts> \
   ./prereqs-install.sh
 ```
+
+The demo logs in with a synthetic test user (`test:1`) gated by
+`SH_TEST_USER_SECRET` — no external identity provider needed.
 
 The script creates a kind cluster `moca`, runs MOCA's `deploy/k8s/setup.sh`
 with `SH_WORKLOAD_SANDBOXES=1` (installs `moca-provisioner` and the
@@ -194,11 +198,15 @@ along with the cluster, use `./prereqs-uninstall.sh`.
 
 ### Log in (once per machine)
 
+Log in as the test user the install step configured (the same
+`SH_TEST_USER_SECRET` you passed above).
+
 ```bash
 export SH_CONTROL_PLANE_URL=http://127.0.0.1:18090
+export SH_TEST_USER_SECRET=<the-secret-you-passed-to-prereqs-install>
 # The demo uses a **fixed Anthropic model** – `claude-opus-4-8`.
 # This model cannot be overridden via any command‑line flag at the moment.
-mocactl login
+MOCA_TEST_USER_SECRET="$SH_TEST_USER_SECRET" mocactl login --test-user 1
 printf %s "$ANTHROPIC_AUTH_TOKEN" | mocactl credentials add anthropic \
   --host "$(printf %s "$ANTHROPIC_BASE_URL" | awk -F/ '{print $3}')" --kind bearer \
   --endpoint "$ANTHROPIC_BASE_URL"
@@ -206,25 +214,15 @@ printf %s "$ANTHROPIC_AUTH_TOKEN" | mocactl credentials add anthropic \
 mocactl doctor
 ```
 
+`mocactl login --test-user 1` writes the standard `~/.config/mocactl/auth.json`,
+so token refresh, `doctor`, `credentials`, `spawn`, and `workloads` all
+behave exactly as with any other login.
+
 `--kind bearer` is required for Anthropic-compatible proxies that expect
 `Authorization: Bearer` (`--kind api-key` is only validated against
 `api.anthropic.com`). To talk directly to `api.anthropic.com` with an
 `ANTHROPIC_API_KEY`, swap in `--host api.anthropic.com --kind api-key
 --endpoint https://api.anthropic.com` and pipe `$ANTHROPIC_API_KEY`.
-
-> **No-browser alternative:** `prereqs-install.sh` accepts `SH_TEST_USERS=1`
-> and `SH_TEST_USER_SECRET` (≥16 chars). With those set it configures the
-> control plane's synthetic test users (ADR-0045, dev/test only) and prints
-> the alternative login in its "next steps". Instead of `mocactl login`:
->
-> ```bash
-> MOCA_TEST_USER_SECRET="$SH_TEST_USER_SECRET" mocactl login --test-user 1
-> ```
->
-> This writes the same `~/.config/mocactl/auth.json` a device login does, so
-> everything downstream (refresh, `doctor`, `credentials`, `spawn`) is
-> identical. `SH_GITHUB_CLIENT_ID` is still required — without it the control
-> plane deploys with 0 replicas — but no browser login ever happens.
 
 `mocactl doctor` must go all-green before `./setup.sh`.
 
