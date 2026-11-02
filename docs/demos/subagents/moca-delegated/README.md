@@ -129,6 +129,13 @@ cd "$CLONE_DIR/state-lab/docs/demos/subagents/moca-delegated"
 
 ### Install the cluster-side pieces
 
+```bash
+git clone https://github.com/rossoctl/state-lab "$CLONE_DIR/state-lab"
+cd "$CLONE_DIR/state-lab/docs/demos/subagents/moca-delegated"
+```
+
+### Install the cluster-side pieces
+
 > **Important:** The harness expects an Anthropic‑compatible endpoint and token. Make sure `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` are exported in your shell *before* you run `./prereqs-install.sh`. Otherwise the install script will error out silently.
 
 
