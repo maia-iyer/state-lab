@@ -119,6 +119,14 @@ The MOCA checkout must be at or after
 [`dd918ac`](https://github.com/rossoctl/moca/commit/dd918ac9) (later
 than `v0.9.0`), which deploys Valkey 9 as the session store.
 
+Then clone this demo's repo alongside them and cd into the demo directory
+(all remaining instructions run from here):
+
+```bash
+git clone https://github.com/rossoctl/state-lab "$CLONE_DIR/state-lab"
+cd "$CLONE_DIR/state-lab/docs/demos/subagents/moca-delegated"
+```
+
 ### Install the cluster-side pieces
 
 ```bash
