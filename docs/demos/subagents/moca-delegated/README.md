@@ -212,6 +212,20 @@ mocactl doctor
 `ANTHROPIC_API_KEY`, swap in `--host api.anthropic.com --kind api-key
 --endpoint https://api.anthropic.com` and pipe `$ANTHROPIC_API_KEY`.
 
+> **No-browser alternative:** `prereqs-install.sh` accepts `SH_TEST_USERS=1`
+> and `SH_TEST_USER_SECRET` (≥16 chars). With those set it configures the
+> control plane's synthetic test users (ADR-0045, dev/test only) and prints
+> the alternative login in its "next steps". Instead of `mocactl login`:
+>
+> ```bash
+> MOCA_TEST_USER_SECRET="$SH_TEST_USER_SECRET" mocactl login --test-user 1
+> ```
+>
+> This writes the same `~/.config/mocactl/auth.json` a device login does, so
+> everything downstream (refresh, `doctor`, `credentials`, `spawn`) is
+> identical. `SH_GITHUB_CLIENT_ID` is still required — without it the control
+> plane deploys with 0 replicas — but no browser login ever happens.
+
 `mocactl doctor` must go all-green before `./setup.sh`.
 
 ## Setup

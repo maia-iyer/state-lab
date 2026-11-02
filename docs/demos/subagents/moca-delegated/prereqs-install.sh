@@ -43,6 +43,13 @@ CP_PORT="${CP_PORT:-18090}"
 CS_PORT="${CS_PORT:-19090}"
 HARNESS_URL="http://127.0.0.1:${HARNESS_PORT}"
 
+TEST_USERS="${SH_TEST_USERS:-0}"
+TEST_USER_SECRET="${SH_TEST_USER_SECRET:-}"
+if (( TEST_USERS > 0 )) && [[ ${#TEST_USER_SECRET} -lt 16 ]]; then
+  echo "SH_TEST_USER_SECRET must be at least 16 characters when SH_TEST_USERS > 0" >&2
+  exit 1
+fi
+
 if [[ -z "${SH_GITHUB_CLIENT_ID:-}" ]]; then
   echo "SH_GITHUB_CLIENT_ID is required (GitHub OAuth app, device-flow enabled)." >&2
   exit 1
@@ -82,6 +89,7 @@ echo "==> 2/6 MOCA deploy/k8s/setup.sh"
 # writable) rely on this path.
 (cd "${MOCA_DIR}" && \
   SH_WORKLOAD_SANDBOXES=1 SH_PUBLIC_HARNESS_URL="${HARNESS_URL}" \
+  SH_TEST_USERS="${TEST_USERS}" SH_TEST_USER_SECRET="${TEST_USER_SECRET}" \
   ./deploy/k8s/setup.sh --target kind --build)
 
 echo "==> 3/6 CoreDNS -> 1.1.1.1 / 8.8.8.8 (podman resolv.conf workaround)"
@@ -229,7 +237,20 @@ Prereqs installed. Port-forwards are running in the background; logs:
 Next, once per machine:
 
   export SH_CONTROL_PLANE_URL=http://127.0.0.1:${CP_PORT}
+EOF
+
+if (( TEST_USERS > 0 )); then
+cat <<EOF
+  # No browser needed: log in as synthetic test user 1 (secret-gated, ADR-0045).
+  MOCA_TEST_USER_SECRET="\$SH_TEST_USER_SECRET" mocactl login --test-user 1
+EOF
+else
+cat <<EOF
   mocactl login
+EOF
+fi
+
+cat <<EOF
   # ANTHROPIC_BASE_URL points at an Anthropic-compatible endpoint (e.g. a
   # LiteLLM gateway); ANTHROPIC_AUTH_TOKEN is the bearer token for it.
   printf %s "\$ANTHROPIC_AUTH_TOKEN" | mocactl credentials add anthropic \\
