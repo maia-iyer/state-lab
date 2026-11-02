@@ -129,14 +129,12 @@ cd "$CLONE_DIR/state-lab/docs/demos/subagents/moca-delegated"
 
 ### Install the cluster-side pieces
 
-> **Important:** The harness expects an Anthropic‑compatible endpoint and token. Make sure `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` (and, if desired, `SH_MODEL`) are exported in your shell *before* you run `./prereqs-install.sh`. Otherwise the install script will error out silently.
+> **Important:** The harness expects an Anthropic‑compatible endpoint and token. Make sure `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` are exported in your shell *before* you run `./prereqs-install.sh`. Otherwise the install script will error out silently.
 
 
 ```bash
 export ANTHROPIC_BASE_URL=<your-anthropic-base-url>
 export ANTHROPIC_AUTH_TOKEN=<your-anthropic-auth-token>
-# optional – change model if desired
-export SH_MODEL=claude-opus-4-8
 
 SH_GITHUB_CLIENT_ID=<your-oauth-client-id> \
 CLONE_DIR=<parent-of-both-checkouts> \
@@ -191,8 +189,8 @@ along with the cluster, use `./prereqs-uninstall.sh`.
 
 ```bash
 export SH_CONTROL_PLANE_URL=http://127.0.0.1:18090
-# Default model is `claude-opus-4-8`. Override by setting SH_MODEL to another model ID.
-export SH_MODEL=claude-opus-4-8
+# The demo uses a **fixed Anthropic model** – `claude-opus-4-8`.
+# This model cannot be overridden via any command‑line flag at the moment.
 mocactl login
 printf %s "$ANTHROPIC_AUTH_TOKEN" | mocactl credentials add anthropic \
   --host "$(printf %s "$ANTHROPIC_BASE_URL" | awk -F/ '{print $3}')" --kind bearer \
