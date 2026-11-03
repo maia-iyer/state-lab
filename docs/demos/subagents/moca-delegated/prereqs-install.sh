@@ -30,7 +30,9 @@ set -euo pipefail
 # it at wherever you cloned the two repos (see README > Checkouts).
 # SH_TEST_USERS / SH_TEST_USER_SECRET configure the control plane's
 # test-user logins — the demo's login method (shared-secret, no external
-# identity provider).
+# identity provider). This is just a demo, so the secret defaults to a
+# fixed constant; the README's login section uses the same value.
+SH_TEST_USER_SECRET_DEFAULT="state-lab-demo-secret"
 : "${CLONE_DIR:?CLONE_DIR is required: parent of the moca/ and context-service/ checkouts (see README > Checkouts)}"
 
 MOCA_DIR="${CLONE_DIR}/moca"
@@ -47,9 +49,9 @@ CS_PORT="${CS_PORT:-19090}"
 HARNESS_URL="http://127.0.0.1:${HARNESS_PORT}"
 
 TEST_USERS="${SH_TEST_USERS:-0}"
-TEST_USER_SECRET="${SH_TEST_USER_SECRET:-}"
+TEST_USER_SECRET="${SH_TEST_USER_SECRET:-$SH_TEST_USER_SECRET_DEFAULT}"
 if (( TEST_USERS == 0 )); then
-  echo "Set SH_TEST_USERS=1 and SH_TEST_USER_SECRET (>=16 chars) — they configure the demo's login." >&2
+  echo "Set SH_TEST_USERS=1 — it configures the demo's test-user login." >&2
   exit 1
 fi
 if [[ ${#TEST_USER_SECRET} -lt 16 ]]; then
